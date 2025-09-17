@@ -1,4 +1,4 @@
-package com.digitalbank.Interface;
+package com.digitalbank.repository;
 
 import com.digitalbank.domain.User;
 import java.util.Optional;
