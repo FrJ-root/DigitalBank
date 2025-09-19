@@ -1,16 +1,17 @@
 package com.digitalbank.service;
 
 import com.digitalbank.domain.User;
-import com.digitalbank.repository.UserRepository;
+import com.digitalbank.repository.UserRepo;
+import com.digitalbank.utils.PasswordHasher;
 import com.digitalbank.validation.UserValidator;
 
 import java.util.Optional;
 
 public class AuthService {
 
-    private final UserRepository userRepository;
+    private final UserRepo userRepository;
 
-    public AuthService(UserRepository userRepository) {
+    public AuthService(UserRepo userRepository) {
         this.userRepository = userRepository;
     }
 
@@ -44,12 +45,11 @@ public class AuthService {
         }
 
         User user = userOpt.get();
+        String hashedInput = PasswordHasher.hash(password);
         if (!user.getPassword().equals(password)) {
             System.out.println("Incorrect password");
-            return user;
+            return null;
         }
-
-        System.out.println("Login succes, " + email);
         return user;
     }
 }

@@ -1,96 +1,63 @@
 package com.digitalbank.app;
 
-import com.digitalbank.repository.UserRepository;
-import com.digitalbank.memory.InMemoryUserRepository;
+import com.digitalbank.memory.InMemoryAccountRepo;
+import com.digitalbank.memory.InMemoryUserRepo;
+import com.digitalbank.service.AccountService;
+import com.digitalbank.controller.AccountMenu;
+import com.digitalbank.controller.BankMenu;
+import com.digitalbank.repository.UserRepo;
 import com.digitalbank.service.AuthService;
+import com.digitalbank.utils.ConsoleClear;
 import com.digitalbank.domain.User;
-
 import java.util.Scanner;
 
 public class Main {
-    public static UserRepository userRepository = new InMemoryUserRepository();
-    public static AuthService authService = new AuthService(userRepository);
     public static Scanner scanner = new Scanner(System.in);
+    public static AccountService accountService = new AccountService(new InMemoryAccountRepo());
+    public static AccountMenu accountMenu = new AccountMenu(accountService, scanner);
+    public static UserRepo userRepository = new InMemoryUserRepo();
+    public static AuthService authService = new AuthService(userRepository);
 
-    public static void mainAuthenticatedMenu(User user) {
-        boolean running = true;
-        while (running) {
-            System.out.println("\n=== Main Menu (Logged in as " + user.getEmail() + ") ===");
-            System.out.println("1. Update profile");
-            System.out.println("2. Change password");
-            System.out.println("3. Create account");
-            System.out.println("4. List my accounts");
-            System.out.println("5. Deposit");
-            System.out.println("6. Withdraw");
-            System.out.println("7. Transfer");
-            System.out.println("8. Transaction history");
-            System.out.println("9. Close account");
-            System.out.println("0. Logout");
-            System.out.print("Choose: ");
+    public static void loginPhase() {
+        ConsoleClear.clear();
+        int attempts = 0;
+        final int MAX_ATTEMPTS = 3;
 
-            String choice = scanner.nextLine();
-
-            switch (choice) {
-                case "1":
-//                    authService.updateProfile(user);
-                    break;
-                case "2":
-//                    authService.changePassword(user);
-                    break;
-                case "3":
-//                    accountService.createAccount(user);
-                    break;
-                case "4":
-//                    accountService.listAccounts(user);
-                    break;
-                case "5":
-//                    transactionService.deposit(user);
-                    break;
-                case "6":
-//                    transactionService.withdraw(user);
-                    break;
-                case "7":
-//                    transactionService.transfer(user);
-                    break;
-                case "8":
-//                    transactionService.history(user);
-                    break;
-                case "9":
-//                    accountService.closeAccount(user);
-                    break;
-                case "0":
-                    running = false;
-                    System.out.println("Logged out successfully.");
-                    break;
-                default:
-                    System.out.println("Invalid option");
-            }
-        }
-    }
-
-
-    public static void loginPhase(){
-        System.out.print("Enter Email: ");
-        String loginEmail = scanner.nextLine();
-        while (loginEmail.isEmpty()) {
-            System.out.println("    !! Email cannot be empty.");
+        while (attempts < MAX_ATTEMPTS) {
             System.out.print("Enter Email: ");
-            loginEmail = scanner.nextLine();
-        }
-        System.out.print("Enter Password: ");
-        String loginPassword = scanner.nextLine();
-        while (loginPassword.isEmpty()) {
-            System.out.println("    !! Password cannot be empty.");
+            String loginEmail = scanner.nextLine().trim();
+            while (loginEmail.isEmpty()) {
+                System.out.println("    !! Email cannot be empty.");
+                System.out.print("Enter Email: ");
+                loginEmail = scanner.nextLine().trim();
+            }
+
             System.out.print("Enter Password: ");
-            loginPassword = scanner.nextLine();
+            String loginPassword = scanner.nextLine();
+            while (loginPassword.isEmpty()) {
+                System.out.println("    !! Password cannot be empty.");
+                System.out.print("Enter Password: ");
+                loginPassword = scanner.nextLine();
+            }
+
+            User loggedInUser = authService.login(loginEmail, loginPassword);
+            if (loggedInUser != null) {
+                BankMenu.mainMenu(loggedInUser);
+                return;
+            }
+
+            attempts++;
+            System.out.println("    !! Bad credentials, try again (" + (MAX_ATTEMPTS - attempts) + " attempts left)\n");
         }
-        User loggedInUser = authService.login(loginEmail, loginPassword);
-        if (loggedInUser != null) {
-            mainAuthenticatedMenu(loggedInUser);
-        }
+
+        System.out.println("    !! Too many failed attempts.");
+        System.out.print("       | Press Enter to Back...");
+        scanner.nextLine();
+        menuPhase();
     }
 
     public static void registerPhase(){
+        ConsoleClear.clear();
         System.out.print("Enter Name: ");
         String name = scanner.nextLine();
         while (name.isEmpty()) {
@@ -125,19 +92,35 @@ public class Main {
         authService.register(name, address, email, password);
     }
 
-    public static void welcomePhase(){
-        System.out.println("=== Welcome to the Digital Bank ===");
+    public static void Effect(String text, int retard) {
+        for (char c : text.toCharArray()) {
+            System.out.print(c);
+            System.out.flush();
+            try {
+                Thread.sleep(retard);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
+    }
 
-        System.out.print("Press Enter to continue...");
+    public static void welcomePhase() {
+        ConsoleClear.clear();
+        System.out.println("   === *********************** ===");
+        String[] startApp = {
+                "   === DIGITAL BANKING PROGRAM ===",
+        };
+        for (String line : startApp) {
+            Effect(line, 50);
+            System.out.println();
+        }
+        System.out.println("   === *********************** ===\n\n\n");
+        System.out.print(" | Press Enter to continue...");
         scanner.nextLine();
     }
 
     public static void menuPhase(){
-        welcomePhase();
-        System.out.println("|---");
-        System.out.println("    |");
-        System.out.println("     ->     Menu");
-
+        ConsoleClear.clear();
         System.out.println("1. Register");
         System.out.println("2. Login");
         System.out.println("0. Exit\n");
@@ -149,6 +132,7 @@ public class Main {
         switch (option) {
             case 1:
                 registerPhase();
+                ConsoleClear.clear();
                 System.out.println("1. Login");
                 System.out.println("0. Go to Menu\n");
                 System.out.print("   Choose: ");
@@ -163,34 +147,19 @@ public class Main {
                         break;
                 }
                 break;
-
             case 2:
                 loginPhase();
-//                System.out.println("1. Login");
-//                System.out.println("0. Go to Menu\n");
-//                System.out.print("   Choose: ");
-//                int option2 = scanner.nextInt();
-//                scanner.nextLine();
-//                switch(option2){
-//                    case 1:
-//                        loginPhase();
-//                        break;
-//                    case 0:
-//                        menuPhase();
-//                        break;
-//                }
                 break;
-
             case 0:
                 System.out.print("Goodbye!");
                 break;
-
             default:
                 System.out.print("    Ooops! choose JUst from the menu");
         }
     }
 
     public static void main(String[] args){
+        welcomePhase();
         menuPhase();
     }
 }

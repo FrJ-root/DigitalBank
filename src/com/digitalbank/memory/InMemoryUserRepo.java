@@ -1,13 +1,12 @@
 package com.digitalbank.memory;
 
 import com.digitalbank.domain.User;
-import com.digitalbank.repository.UserRepository;
-
+import com.digitalbank.repository.UserRepo;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-public class InMemoryUserRepository implements UserRepository {
+public class InMemoryUserRepo implements UserRepo {
     private final Map<String, User> users = new HashMap<>();
 
     @Override

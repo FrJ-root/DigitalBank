@@ -1,5 +1,4 @@
 package com.digitalbank.domain;
-
 import java.util.UUID;
 
 public class User {
