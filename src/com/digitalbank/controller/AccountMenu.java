@@ -1,10 +1,9 @@
 package com.digitalbank.controller;
 
-import com.digitalbank.domain.User;
-import com.digitalbank.service.AccountService;
-import com.digitalbank.utils.ConsoleClear;
-
 import java.util.Scanner;
+import com.digitalbank.domain.User;
+import com.digitalbank.utils.ConsoleClear;
+import com.digitalbank.service.AccountService;
 
 public class AccountMenu {
     private final AccountService accountService;

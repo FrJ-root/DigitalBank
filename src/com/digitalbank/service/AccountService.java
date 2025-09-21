@@ -1,21 +1,16 @@
 package com.digitalbank.service;
 
-import com.digitalbank.domain.Account;
 import com.digitalbank.domain.User;
-import com.digitalbank.repository.AccountRepo;
+import com.digitalbank.domain.Account;
 import com.digitalbank.utils.ConsoleClear;
+import com.digitalbank.repository.AccountRepo;
+import static com.digitalbank.app.Main.scanner;
 
 import java.util.List;
-
-import static com.digitalbank.app.Main.scanner;
 
 public class AccountService {
     private final AccountRepo accountRepository;
     private boolean active;
-
-    public AccountService(AccountRepo accountRepository) {
-        this.accountRepository = accountRepository;
-    }
 
     public Account createAccount(User user) {
         Account account = new Account(user.getId());
@@ -26,10 +21,6 @@ public class AccountService {
         System.out.print("Press ENTER to back ...");
         scanner.nextLine();
         return account;
-    }
-
-    public List<Account> listAccounts(User user) {
-        return accountRepository.findByUserId(user.getId());
     }
 
     public void showAccounts(User user, String accountId) {
@@ -75,4 +66,13 @@ public class AccountService {
             }
         }
     }
+
+    public AccountService(AccountRepo accountRepository) {
+        this.accountRepository = accountRepository;
+    }
+
+    public List<Account> listAccounts(User user) {
+        return accountRepository.findByUserId(user.getId());
+    }
+
 }

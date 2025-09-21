@@ -3,23 +3,41 @@ package com.digitalbank.domain;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
+import java.util.Map;
 
 public class Account {
-    private final UUID ownerId;
-    private final String accountId;
-    private BigDecimal balance;
     private final Instant createdAt;
+    private final String accountId;
+    private final UUID ownerId;
+    private BigDecimal balance;
     private Instant closedAt;
     private boolean active;
 
-    public Account(UUID ownerId) {
-        this.ownerId = ownerId;
-        this.accountId = generateAccountId();
-        this.balance = BigDecimal.ZERO;
-        this.createdAt = Instant.now();
-        this.active = true;
+    public void deposit(BigDecimal amount) {
+        this.balance = this.balance.add(amount);
+    }
+
+    private final Map<String, Account> accounts = new HashMap<>();
+
+    public Instant getCreatedAt() { return createdAt; }
+
+    public String getAccountId() { return accountId; }
+
+    public BigDecimal getBalance() { return balance; }
+
+    public UUID getOwnerUserId() { return ownerId; }
+
+    public boolean withdraw(BigDecimal amount) {
+        if (this.balance.compareTo(amount) >= 0) {
+            this.balance = this.balance.subtract(amount);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isActive() {
+        return active;
     }
 
     private String generateAccountId() {
@@ -28,23 +46,12 @@ public class Account {
         return "BK-" + randomPart + "-" + suffix;
     }
 
-    public String getAccountId() { return accountId; }
-
-    public UUID getOwnerUserId() { return ownerId; }
-
-    public BigDecimal getBalance() { return balance; }
-
-    public Instant getCreatedAt() { return createdAt; }
-
-    public boolean isActive() {
-        return active;
-    }
-
-    public boolean activate() {
-        if (active) return false; // already active
+    public Account(UUID ownerId) {
+        this.ownerId = ownerId;
+        this.accountId = generateAccountId();
+        this.balance = BigDecimal.ZERO;
+        this.createdAt = Instant.now();
         this.active = true;
-        this.closedAt = null;
-        return true;
     }
 
     public boolean deactivate() {
@@ -57,23 +64,17 @@ public class Account {
         return true;
     }
 
-    public void deposit(BigDecimal amount) {
-        this.balance = this.balance.add(amount);
+    public boolean activate() {
+        if (active) return false; // already active
+        this.active = true;
+        this.closedAt = null;
+        return true;
     }
-
-    public boolean withdraw(BigDecimal amount) {
-        if (this.balance.compareTo(amount) >= 0) {
-            this.balance = this.balance.subtract(amount);
-            return true;
-        }
-        return false;
-    }
-
-    private final Map<String, Account> accounts = new HashMap<>();
 
     @Override
     public String toString() {
         return String.format("%s | Balance: %.2f | Status: %s",
                 accountId, balance, active ? "Active" : "Inactive");
     }
+
 }

@@ -12,48 +12,22 @@ import com.digitalbank.domain.User;
 import java.util.Scanner;
 
 public class Main {
-    public static Scanner scanner = new Scanner(System.in);
     public static AccountService accountService = new AccountService(new InMemoryAccountRepo());
+    public static Scanner scanner = new Scanner(System.in);
     public static AccountMenu accountMenu = new AccountMenu(accountService, scanner);
     public static UserRepo userRepository = new InMemoryUserRepo();
     public static AuthService authService = new AuthService(userRepository);
 
-    public static void loginPhase() {
-        ConsoleClear.clear();
-        int attempts = 0;
-        final int MAX_ATTEMPTS = 3;
-
-        while (attempts < MAX_ATTEMPTS) {
-            System.out.print("Enter Email: ");
-            String loginEmail = scanner.nextLine().trim();
-            while (loginEmail.isEmpty()) {
-                System.out.println("    !! Email cannot be empty.");
-                System.out.print("Enter Email: ");
-                loginEmail = scanner.nextLine().trim();
+    public static void Effect(String text, int retard) {
+        for (char c : text.toCharArray()) {
+            System.out.print(c);
+            System.out.flush();
+            try {
+                Thread.sleep(retard);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
             }
-
-            System.out.print("Enter Password: ");
-            String loginPassword = scanner.nextLine();
-            while (loginPassword.isEmpty()) {
-                System.out.println("    !! Password cannot be empty.");
-                System.out.print("Enter Password: ");
-                loginPassword = scanner.nextLine();
-            }
-
-            User loggedInUser = authService.login(loginEmail, loginPassword);
-            if (loggedInUser != null) {
-                BankMenu.mainMenu(loggedInUser);
-                return;
-            }
-
-            attempts++;
-            System.out.println("    !! Bad credentials, try again (" + (MAX_ATTEMPTS - attempts) + " attempts left)\n");
         }
-
-        System.out.println("    !! Too many failed attempts.");
-        System.out.print("       | Press Enter to Back...");
-        scanner.nextLine();
-        menuPhase();
     }
 
     public static void registerPhase(){
@@ -92,18 +66,6 @@ public class Main {
         authService.register(name, address, email, password);
     }
 
-    public static void Effect(String text, int retard) {
-        for (char c : text.toCharArray()) {
-            System.out.print(c);
-            System.out.flush();
-            try {
-                Thread.sleep(retard);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-        }
-    }
-
     public static void welcomePhase() {
         ConsoleClear.clear();
         System.out.println("   === *********************** ===");
@@ -117,6 +79,44 @@ public class Main {
         System.out.println("   === *********************** ===\n\n\n");
         System.out.print(" | Press Enter to continue...");
         scanner.nextLine();
+    }
+
+    public static void loginPhase() {
+        ConsoleClear.clear();
+        int attempts = 0;
+        final int MAX_ATTEMPTS = 3;
+
+        while (attempts < MAX_ATTEMPTS) {
+            System.out.print("Enter Email: ");
+            String loginEmail = scanner.nextLine().trim();
+            while (loginEmail.isEmpty()) {
+                System.out.println("    !! Email cannot be empty.");
+                System.out.print("Enter Email: ");
+                loginEmail = scanner.nextLine().trim();
+            }
+
+            System.out.print("Enter Password: ");
+            String loginPassword = scanner.nextLine();
+            while (loginPassword.isEmpty()) {
+                System.out.println("    !! Password cannot be empty.");
+                System.out.print("Enter Password: ");
+                loginPassword = scanner.nextLine();
+            }
+
+            User loggedInUser = authService.login(loginEmail, loginPassword);
+            if (loggedInUser != null) {
+                BankMenu.mainMenu(loggedInUser);
+                return;
+            }
+
+            attempts++;
+            System.out.println("    !! Bad credentials, try again (" + (MAX_ATTEMPTS - attempts) + " attempts left)\n");
+        }
+
+        System.out.println("    !! Too many failed attempts.");
+        System.out.print("       | Press Enter to Back...");
+        scanner.nextLine();
+        menuPhase();
     }
 
     public static void menuPhase(){

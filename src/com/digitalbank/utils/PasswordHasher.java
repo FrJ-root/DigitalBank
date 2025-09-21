@@ -3,6 +3,7 @@ package com.digitalbank.utils;
 import java.security.*;
 
 public class PasswordHasher {
+
     public static String hash(String pwd) {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
@@ -14,4 +15,5 @@ public class PasswordHasher {
             throw new RuntimeException(e);
         }
     }
+
 }

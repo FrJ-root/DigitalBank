@@ -2,9 +2,9 @@ package com.digitalbank.controller;
 
 import com.digitalbank.memory.InMemoryAccountRepo;
 import com.digitalbank.memory.InMemoryUserRepo;
+import com.digitalbank.service.AccountService;
 import com.digitalbank.repository.AccountRepo;
 import com.digitalbank.repository.UserRepo;
-import com.digitalbank.service.AccountService;
 import com.digitalbank.service.AuthService;
 import com.digitalbank.utils.ConsoleClear;
 import com.digitalbank.domain.User;

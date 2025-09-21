@@ -1,8 +1,7 @@
 package com.digitalbank.controller;
 
-import com.digitalbank.domain.User;
 import com.digitalbank.utils.ConsoleClear;
-
+import com.digitalbank.domain.User;
 import java.util.Scanner;
 
 public class ProfileMenu {
@@ -17,7 +16,8 @@ public class ProfileMenu {
             System.out.println("4. Email: " + user.getEmail());
             System.out.println("5. Password: ********");
             System.out.println("0. Back");
-            System.out.print("     | Choose : ");
+            System.out.println("   YOu wanna update something?? ");
+            System.out.print("      | Choose : ");
             int choice = scanner.nextInt();
             scanner.nextLine();
             switch (choice) {
@@ -53,6 +53,7 @@ public class ProfileMenu {
                     }
                     break;
                 case 0:
+                    ConsoleClear.clear();
                     BankMenu.mainMenu(user);
                     break;
                 default:
